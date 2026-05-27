@@ -56,12 +56,25 @@ class Invader
         const p = new Projectile(
             {
                 x: this.position.x + this.width / 2 - 1,
-                y: this.position.y + 2,
+                y: this.position.y + this.height,
 
             },
             10
         );
         projectiles.push(p);
+    }
+
+    hit(projectile)
+    {
+        return (
+            projectile.position.x >= this.position.x 
+            &&
+            projectile.position.x <= this.position.x + this.width
+            && 
+            projectile.position.y >= this.position.y
+            &&
+            projectile.position.y <= this.position.y + this.height
+        );
     }
 }
 

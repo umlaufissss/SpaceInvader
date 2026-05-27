@@ -14,6 +14,7 @@ ctx.imageSmoothingEnabled = false;
 const player = new Player(canvas.width, canvas.height);
 const grid = new Grid(3, 6)
 const playerProjectile = [];
+const invaderProjectile = [];
 
 
 const keys = 
@@ -28,7 +29,9 @@ const keys =
 
 const drawProjectiles = () =>
 {
-    playerProjectile.forEach((projectile) =>
+    const projectiles = [...playerProjectile, ...invaderProjectile];
+
+    projectiles.forEach((projectile) =>
     {
         projectile.draw(ctx);
         projectile.update()
@@ -46,12 +49,30 @@ const clearProjectiles = () =>
     });
 }
 
+const checkShootInvaders = () =>
+{
+    grid.invaders.forEach((invader, invaderIndex) => 
+        {
+            playerProjectile.some((projectile, projectileIndex) => 
+            {
+                if(invader.hit(projectile))
+                {
+                    grid.invaders.splice(invaderIndex, 1);
+                    playerProjectile.splice(projectileIndex, 1);
+                }
+            });
+        });
+    
+}
+
 const gameLoop = () =>
 {
     ctx.clearRect(0,0, canvas.width, canvas.height);
 
     drawProjectiles();
     clearProjectiles();
+
+    checkShootInvaders();
 
     grid.draw(ctx);
     grid.update();
@@ -65,7 +86,6 @@ const gameLoop = () =>
     {
         player.shoot(playerProjectile);
         keys.shoot.released = false;
-
     }
 
 
@@ -90,8 +110,6 @@ const gameLoop = () =>
 
     requestAnimationFrame(gameLoop);
 };
-
-gameLoop();
 
 addEventListener('keydown', (event) =>
 {
@@ -119,3 +137,15 @@ addEventListener('keyup', (event) =>
             keys.shoot.released = true;
         }
 });
+
+setInterval(() => {
+    const invader = grid.getRandomInvader()
+
+    if (invader)
+    {
+        invader.shoot(invaderProjectile);
+    }
+}, 1000)
+
+gameLoop();
+
